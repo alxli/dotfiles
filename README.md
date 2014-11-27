@@ -1,4 +1,4 @@
-dotfiles
+Alex's dotfiles
 ========
 
-Configuration files, mainly for GNU/Linux ricing
+My configuration files, mainly for GNU/Linux ricing.
