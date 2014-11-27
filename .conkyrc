@@ -13,7 +13,7 @@ override_utf8_locale yes
 TEXT
 
 [
-  { "full_text" : "Now Playing" , "color" : "\#b72f62" } ,
+  { "full_text" : "Now Playing" , "color" : "\#cc0000" } ,
   { "full_text" : "${if_mpd_playing}${mpd_smart 50} ${mpd_elapsed}/${mpd_length}${else}${mpd_status}${endif}" ,
     "color" : "\#d3d7cf"
   } ,
