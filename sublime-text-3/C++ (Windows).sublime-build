@@ -1,0 +1,25 @@
+/* 
+  C++ build system for singleton programs in contests (Windows version).
+  In Sublime Text 3, go to "Tools>Build System>New Build System" to add.
+  Default keybindings: Ctrl+B to build, Ctrl+Shift+B to run
+*/
+
+{
+  "path": "C:\\MinGW\\bin\\",
+  "cmd" : [
+    "g++", "$file_name", "-O2", "-o", "${file_base_name}.exe",
+    "-Wall", "-Wl,--stack,536870912" /* stack limit to 512 MiB */
+  ],
+  "selector" : "source.cpp",
+  "shell": true,
+  "variants": [
+    {   
+      "name": "Run",
+      "cmd": [
+         //"start",    /* uncomment to run in external console */
+         "${file_base_name}.exe"
+      ],
+      "shell": true,
+    }
+  ]
+}
