@@ -16,10 +16,11 @@
     {
       "name": "Run",
       "cmd": [
-        "./${file_base_name}"
-
         /* Run in external console (switch urxvt to emulator of your choice, e.g. xterm) */
         //"urxvt -e bash -c \"./${file_base_name};read -p 'Press [Enter] to continue...'\"",
+        
+        /* or just run normally... */
+        "./${file_base_name}"
       ],
       "shell": true,
     }
