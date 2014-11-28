@@ -8,6 +8,7 @@
   "path": "C:\\MinGW\\bin\\",
   "cmd" : [
     "g++", "$file_name", "-O2", "-o", "${file_base_name}.exe",
+    //"-std=gnu++11",             /* uncomment to enable C++11 */
     "-Wall", "-Wl,--stack,536870912" /* stack limit to 512 MiB */
   ],
   "selector" : "source.cpp",
