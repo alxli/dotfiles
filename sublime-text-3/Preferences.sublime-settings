@@ -1,42 +1,42 @@
 {
-	"caret_extra_width": 2,
-	"caret_style": "smooth",
-	"color_scheme": "Packages/Color Scheme - Default/Twilight.tmTheme",
-	"default_encoding": "UTF-8",
-	"default_line_ending": "unix",
-	"ensure_newline_at_eof_on_save": false,
-	"file_exclude_patterns":
-	[
-		".DS_Store",
-		"Desktop.ini",
-		"*.pyc",
-		"._*",
-		"Thumbs.db",
-		".Spotlight-V100",
-		".Trashes"
-	],
-	"folder_exclude_patterns":
-	[
-		".git",
-		"node_modules"
-	],
-	"font_size": 10,
-	"highlight_modified_tabs": true,
-	"ignored_packages":
-	[
-		"Vintage"
-	],
-	"match_brackets": true,
-	"match_brackets_angle": true,
-	"rulers":
-	[
-		80
-	],
-	"show_encoding": true,
-	"show_line_endings": true,
-	"tab_size": 2,
-	"theme": "Soda Dark.sublime-theme",
-	"translate_tabs_to_spaces": true,
-	"trim_trailing_white_space_on_save": true,
-	"word_wrap": true
+  "caret_extra_width": 2,
+  "caret_style": "smooth",
+  "color_scheme": "Packages/Color Scheme - Default/Blackboard.tmTheme",
+  "default_encoding": "UTF-8",
+  "default_line_ending": "unix",
+  "ensure_newline_at_eof_on_save": false,
+  "file_exclude_patterns":
+  [
+    ".DS_Store",
+    "Desktop.ini",
+    "*.pyc",
+    "._*",
+    "Thumbs.db",
+    ".Spotlight-V100",
+    ".Trashes"
+  ],
+  "folder_exclude_patterns":
+  [
+    ".git",
+    "node_modules"
+  ],
+  "font_size": 10,
+  "highlight_modified_tabs": true,
+  "ignored_packages":
+  [
+    "Vintage"
+  ],
+  "match_brackets": true,
+  "match_brackets_angle": true,
+  "rulers":
+  [
+    80
+  ],
+  "show_encoding": true,
+  "show_line_endings": true,
+  "tab_size": 2,
+  //"theme": "Soda Dark.sublime-theme",
+  "translate_tabs_to_spaces": true,
+  "trim_trailing_white_space_on_save": true,
+  "word_wrap": true
 }
