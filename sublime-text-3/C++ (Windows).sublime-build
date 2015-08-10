@@ -5,7 +5,8 @@
 */
 
 {
-  "path": "C:\\MinGW\\bin\\",   /* unnecessary if your PATH is set */
+  //the line below is unnecessary if your PATH variable is set
+  "path": "C:\\MinGW\\bin\\",
   "cmd" : [
     "g++", "$file_name", "-O2", "-o", "${file_base_name}.exe",
     //"-std=gnu++11",                 /* uncomment to enable C++11 */
