@@ -10,7 +10,9 @@
   "cmd" : [
     "g++", "$file_name", "-O2", "-o", "${file_base_name}.exe",
     //"-std=gnu++11",                 /* uncomment to enable C++11 */
-    "-Wall", "-Wl,--stack,536870912",    /* stack limit to 512 MiB */
+    //"-pedantic",       /* uncomment to warn about ISO compliancy */
+    "-Wall",             /* comment if you don't want any warnings */
+    "-Wl,--stack,536870912",             /* stack limit to 512 MiB */
     "&&",
     //"start",             /* uncomment to run in external console */
     "${file_path}/${file_base_name}.exe",
