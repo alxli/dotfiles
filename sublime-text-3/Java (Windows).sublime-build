@@ -1,7 +1,7 @@
 /*
   Java build system for singleton programs in contests (Windows version).
   In Sublime Text 3, go to "Tools>Build System>New Build System" to add.
-  Default keybindings: Ctrl+B to build, Ctrl+Shift+B to run
+  For version 3083. Default keybindings: Ctrl + B to build and run.
 */
 
 {
@@ -9,7 +9,8 @@
   "path": "C:\\Program Files\\Java\\jdk1.8.0_60\\bin\\",
   "cmd" : [
             "javac", "$file_name", "&&",
-            "java", "${file_base_name}"],
+            "java", "${file_base_name}"
+          ],
   "selector" : "source.java",
   "shell": true,
 }
