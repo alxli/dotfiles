@@ -6,7 +6,7 @@
 
 {
   //the line below is unnecessary if your PATH variable is set
-  "path": "C:\\Program Files\\Java\\jdk1.8.0_51\\bin\\",
+  "path": "C:\\Program Files\\Java\\jdk1.8.0_60\\bin\\",
   "cmd" : [
             "javac", "$file_name", "&&",
             "java", "${file_base_name}"],
