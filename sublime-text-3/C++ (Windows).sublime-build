@@ -14,7 +14,7 @@
     "-Wall",             /* comment if you don't want any warnings */
     "-Wl,--stack,536870912",             /* stack limit to 512 MiB */
     "&&",
-    //"start",             /* uncomment to run in external console */
+    //"start", "",         /* uncomment to run in external console */
     "${file_path}/${file_base_name}.exe",
   ],
   "selector" : "source.cpp",
