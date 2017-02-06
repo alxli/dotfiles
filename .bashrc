@@ -43,7 +43,7 @@ fi
 # Pretty prompt (Recommended font: Ohsnap)
 export PS1="\[$(tput setaf 1)\]┌─╼ \[$(tput setaf 3)\][\u@\h] \[$(tput setaf 6)\]\w\n\[$(tput setaf 1)\]\$(if [[ \$? == 0 ]]; then echo \"\[$(tput setaf 1)\]└────╼\"; else echo \"\[$(tput setaf 1)\]└╼\"; fi) \[$(tput setaf 7)\]"
 
-trap 'echo -ne "\e[0m"' DEBUG
+# trap 'echo -ne "\e[0m"' DEBUG
 
 # If this is an xterm set the title to user@host:dir
 case "$TERM" in
@@ -114,9 +114,8 @@ if [ "$(uname)" == "Darwin" ]; then
     # For colors on Mac, we need to install gls using "brew install coreutils"
     alias ls='gls -h --color=auto'
 else
-  	 alias ls='ls -h --color=auto'
+    alias ls='ls -h --color=auto'
 fi
-alias ls='ls -h --color=auto'
 alias lx='ls -lXB'         #  Sort by extension.
 alias lk='ls -lSr'         #  Sort by size, biggest last.
 alias lt='ls -ltr'         #  Sort by date, most recent last.
@@ -174,8 +173,11 @@ man() {
   man "$@"
 }
 
-# Auto cd
-shopt -s autocd
+# Auto cd into directories without needing to type cd before.
+# Option only available after bash 4.0.
+if [[ $(shopt -p) =~ "autocd" ]]; then
+  shopt -s autocd
+fi
 
 # ls after a cd
 function cd() {
@@ -209,7 +211,7 @@ function ff() {
   find . -type f -iname '*'"$*"'*' -ls ;
 }
 
-#  Find a pattern in a set of files and highlight them:
+# Find a pattern in a set of files and highlight them:
 #+ (needs a recent version of egrep).
 function fstr() {
   OPTIND=1
