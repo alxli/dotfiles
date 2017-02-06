@@ -41,11 +41,7 @@ if [ -n "$force_color_prompt" ]; then
 fi
 
 # Pretty prompt (Recommended font: Ohsnap)
-if [ -n "$SSH_CONNECTION" ]; then
-export PS1="\[$(tput setaf 1)\]┌─╼ \[$(tput setaf 7)\][\w]\n\[$(tput setaf 1)\]\$(if [[ \$? == 0 ]]; then echo \"\[$(tput setaf 1)\]└────╼ \[$(tput setaf 7)\][ssh]\"; else echo \"\[$(tput setaf 1)\]└╼ \[$(tput setaf 7)\][ssh]\"; fi) \[$(tput setaf 7)\]"
-else
 export PS1="\[$(tput setaf 1)\]┌─╼ \[$(tput setaf 3)\][\u@\h] \[$(tput setaf 6)\]\w\n\[$(tput setaf 1)\]\$(if [[ \$? == 0 ]]; then echo \"\[$(tput setaf 1)\]└────╼\"; else echo \"\[$(tput setaf 1)\]└╼\"; fi) \[$(tput setaf 7)\]"
-fi
 
 trap 'echo -ne "\e[0m"' DEBUG
 
@@ -99,17 +95,27 @@ alias aptup="sudo apt-get update && sudo apt-get upgrade"
 alias pacup="sudo pacman -Syu"
 alias aup="yaourt -Syu --aur"
 
-# Editors and configs (change subl3 to whatever you edit with)
-alias subl="subl3"
-alias susubl="sudo subl3"
-alias fstab="sudo subl3 /etc/fstab"
-alias grubcfg="sudo subl3 /etc/default/grub"
+# Editors and configs:
+export VISUAL=vim
+export EDITOR="$VISUAL"
+alias suedit="sudo $EDITOR"
+alias fstab="sudo vim /etc/fstab"
+alias grubcfg="sudo vim /etc/default/grub"
+
+# Fix vim backspace bug in xterm.
+stty erase '^?'
 
 # Pretty-print PATH variables:
 alias printpath='echo -e ${PATH//:/\\n}'
 
 # 'ls' family
 # Add colors for filetype and human-readable sizes by default on 'ls':
+if [ "$(uname)" == "Darwin" ]; then
+    # For colors on Mac, we need to install gls using "brew install coreutils"
+    alias ls='gls -h --color=auto'
+else
+  	 alias ls='ls -h --color=auto'
+fi
 alias ls='ls -h --color=auto'
 alias lx='ls -lXB'         #  Sort by extension.
 alias lk='ls -lSr'         #  Sort by size, biggest last.
@@ -122,7 +128,6 @@ alias ll="ls -lv --group-directories-first"
 alias lm='ll |more'        #  Pipe through 'more'
 alias lr='ll -R'           #  Recursive ls.
 alias la='ll -A'           #  Show hidden files.
-
 
 
 #----------------------------#
@@ -257,7 +262,7 @@ function killps() {  # kill by process name
 
 # Misc utilities. A few of the above functions depend on this!
 
-function repeat() { # example: repeat 10 echo 'hi'
+function repeat() {  # example: repeat 10 echo 'hi'
   local i max
   max=$1; shift;
   for ((i=1; i <= max ; i++)); do  # --> C-like syntax
@@ -265,7 +270,7 @@ function repeat() { # example: repeat 10 echo 'hi'
   done
 }
 
-function ask() { # See 'killps' for example of use.
+function ask() {  # See 'killps' for example of use.
   echo -n "$@" '[y/n] ' ; read ans
   case "$ans" in
     y*|Y*) return 0 ;;
