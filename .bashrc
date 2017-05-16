@@ -1,6 +1,6 @@
 # ~/.bashrc: executed by bash(1) for non-login shells.
 
-# If not running interactively, don't do anything
+# If not running interactively, don't do anything.
 case $- in
   *i*) ;;
     *) return;;
@@ -9,27 +9,31 @@ esac
 # Don't put duplicate lines or lines starting with space in the history.
 HISTCONTROL=ignoreboth
 
-# Add to history instead of overriding it
+# Add to history instead of overriding it.
 shopt -s histappend
 
-# History length
+# History length.
 HISTSIZE=1000
 HISTFILESIZE=2000
 
-# Window size sanity check
+# Sanity check window size after each command.
 shopt -s checkwinsize
 
-# User/root variables definition
+# Use the pattern ** in pathname expansions to match all files and zero or more
+# directories and subdirectories.
+shopt -s globstar
+
+# User/root variables definition.
 if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
   debian_chroot=$(cat /etc/debian_chroot)
 fi
 
-# Colored XTERM promp
+# Colored XTERM promp.
 case "$TERM" in
   xterm-color) color_prompt=yes;;
 esac
 
-# Colored prompt
+# Colored prompt.
 force_color_prompt=yes
 
 if [ -n "$force_color_prompt" ]; then
@@ -40,7 +44,7 @@ if [ -n "$force_color_prompt" ]; then
   fi
 fi
 
-# Pretty prompt (Recommended font: Ohsnap)
+# Pretty prompt (Recommended font: Ohsnap).
 export PS1="\[$(tput setaf 1)\]┌─╼ \[$(tput setaf 3)\][\u@\h] \[$(tput setaf 6)\]\w\n\[$(tput setaf 1)\]\$(if [[ \$? == 0 ]]; then echo \"\[$(tput setaf 1)\]└────╼\"; else echo \"\[$(tput setaf 1)\]└╼\"; fi) \[$(tput setaf 7)\]"
 
 # trap 'echo -ne "\e[0m"' DEBUG
@@ -54,7 +58,7 @@ xterm*|rxvt*)
     ;;
 esac
 
-# Auto-completion
+# Auto-completion.
 if ! shopt -oq posix; then
   if [ -f /usr/share/bash-completion/bash_completion ]; then
     . /usr/share/bash-completion/bash_completion
@@ -64,12 +68,12 @@ if ! shopt -oq posix; then
 fi
 
 
-# Color support using ~/.dircolors
+# Color support using ~/.dircolors.
 # if [ -x /usr/bin/dircolors ]; then
 #   test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
 # fi
 
-# Alias definitions, if you choose to define it separately
+# Alias definitions, if you choose to define it separately.
 # if [ -f ~/.bash_aliases ]; then
 #     . ~/.bash_aliases
 # fi
@@ -133,7 +137,7 @@ alias la='ll -A'           #  Show hidden files.
 #      Useful Functions      #
 #----------------------------#
 
-# Advanced directory creation
+# Advanced directory creation.
 function mkcd {
   if [ ! -n "$1" ]; then
     echo "Please specify a name for the folder e.g. \"mkcd myfolder\"."
@@ -144,7 +148,7 @@ function mkcd {
   fi
 }
 
-# Go back many times (e.g. "b 2" is the same as "cd ../..")
+# Go back many times (e.g. "b 2" is the same as "cd ../..").
 b() {
   str=""
   if [ ! -n "$1" ]; then
@@ -160,7 +164,7 @@ b() {
   cd $str
 }
 
-# Color man pages
+# Colored man pages.
 man() {
   env \
   LESS_TERMCAP_mb=$(printf "\e[1;31m") \
