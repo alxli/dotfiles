@@ -22,6 +22,7 @@
 	],
 	"font_size": 10,
 	"highlight_modified_tabs": true,
+	"index_files": true,
 	"ignored_packages":
 	[
 		"Vintage"
