@@ -6,6 +6,9 @@ case $- in
     *) return;;
 esac
 
+# Add some common places to $PATH.
+export PATH=$PATH:/opt/bin:/usr/local/sbin:/usr/sbin:~/.local/bin
+
 # Don't put duplicate lines or lines starting with space in the history.
 HISTCONTROL=ignoreboth
 
@@ -51,7 +54,7 @@ fi
 
 # Powerline Shell (See: https://github.com/b-ryan/powerline-shell)
 # function _update_ps1() {
-#   PS1=$(~/.local/bin/powerline-shell $?)  # Or wherever it's installed.
+#   PS1=$(powerline-shell $?)  # Or wherever it's installed.
 # }
 # if [[ $TERM != linux && ! $PROMPT_COMMAND =~ _update_ps1 ]]; then
 #   PROMPT_COMMAND="_update_ps1; $PROMPT_COMMAND"
