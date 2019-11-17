@@ -28,38 +28,34 @@ if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
   debian_chroot=$(cat /etc/debian_chroot)
 fi
 
+# export TERM=xterm-256color
+
 # Colored XTERM promp.
 case "$TERM" in
-  xterm-color) color_prompt=yes;;
+  xterm-color|*-256color) color_prompt=yes;;
 esac
 
 # Colored prompt.
 force_color_prompt=yes
 
 if [ -n "$force_color_prompt" ]; then
-    if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
-        # We have color support; assume it's compliant with Ecma-48
-        # (ISO/IEC-6429). (Lack of such support is extremely rare, and such
-        # a case would tend to support setf rather than setaf.)
-        color_prompt=yes
-    else
-        color_prompt=
-    fi
+  if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
+    # We have color support; assume it's compliant with Ecma-48
+    # (ISO/IEC-6429). (Lack of such support is extremely rare, and such
+    # a case would tend to support setf rather than setaf.)
+    color_prompt=yes
+  else
+    color_prompt=
+  fi
 fi
 
-# Pretty prompt (Recommended font: Ohsnap).
-export PS1="\[$(tput setaf 1)\]┌─╼ \[$(tput setaf 3)\][\u@\h] \[$(tput setaf 6)\]\w\n\[$(tput setaf 1)\]\$(if [[ \$? == 0 ]]; then echo \"\[$(tput setaf 1)\]└────╼\"; else echo \"\[$(tput setaf 1)\]└╼\"; fi) \[$(tput setaf 7)\]"
-
-# trap 'echo -ne "\e[0m"' DEBUG
-
-# If this is an xterm set the title to user@host:dir
-case "$TERM" in
-xterm*|rxvt*)
-    PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u: \w\a\]$PS1"
-    ;;
-*)
-    ;;
-esac
+# Powerline Shell (See: https://github.com/b-ryan/powerline-shell)
+# function _update_ps1() {
+#   PS1=$(~/.local/bin/powerline-shell $?)  # Or wherever it's installed.
+# }
+# if [[ $TERM != linux && ! $PROMPT_COMMAND =~ _update_ps1 ]]; then
+#   PROMPT_COMMAND="_update_ps1; $PROMPT_COMMAND"
+# fi
 
 # Auto-completion.
 if ! shopt -oq posix; then
@@ -79,8 +75,6 @@ fi
 # if [ -f ~/.bash_aliases ]; then
 #     . ~/.bash_aliases
 # fi
-
-# Otherwise...
 
 #----------------------------#
 #       Useful Aliases       #
@@ -116,10 +110,10 @@ alias printpath='echo -e ${PATH//:/\\n}'
 # 'ls' family
 # Add colors for filetype and human-readable sizes by default on 'ls':
 if [ "$(uname)" == "Darwin" ]; then
-    # For colors on Mac, we need to install gls using "brew install coreutils"
-    alias ls='gls -h --color=auto'
+  # For colors on Mac, we need to install gls using `brew install coreutils`
+  alias ls='gls -h --color=auto'
 else
-    alias ls='ls -h --color=auto'
+  alias ls='ls -h --color=auto'
 fi
 alias lx='ls -lXB'         #  Sort by extension.
 alias lk='ls -lSr'         #  Sort by size, biggest last.
@@ -183,12 +177,12 @@ if [[ $(shopt -p) =~ "autocd" ]]; then
   shopt -s autocd
 fi
 
-# ls after a cd
+# ls after a cd.
 function cd() {
   builtin cd "$*" && ls
 }
 
-# Extract archives (respective programs must be installed)
+# Extract archives (respective programs must be installed).
 extract() {
   if [ -f $1 ] ; then
     case $1 in
@@ -321,7 +315,7 @@ function cd() {
   builtin cd "$*" && ls
 }
 
-# Extract archives (respective programs must be installed)
+# Extract archives (respective programs must be installed).
 extract() {
   if [ -f $1 ] ; then
     case $1 in
@@ -401,7 +395,7 @@ function killps() {  # kill by process name
 
 # Misc utilities. A few of the above functions depend on this!
 
-function repeat() {  # example: repeat 10 echo 'hi'
+function repeat() {  # example: repeat 10 echo 'hi'.
   local i max
   max=$1; shift;
   for ((i=1; i <= max ; i++)); do  # --> C-like syntax
