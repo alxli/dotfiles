@@ -27,6 +27,21 @@ shopt | grep -q '^autocd\b' && shopt -s autocd
 # and subdirectories. On macOS, you may need to switch to Homebrew's bash.
 shopt | grep -q '^globstar\b' && shopt -s globstar
 
+# Adds variable to $PATH, canonicalizing simlinks and non-existent directories.
+add_to_PATH() {
+  for d; do
+    d=$({ cd -- "$d" && { pwd -P || pwd; } } 2>/dev/null)
+    if [ -z "$d" ]; then continue; fi
+    case ":$PATH:" in
+      *":$d:"*) : ;;
+             *) PATH=$PATH:$d ;;
+    esac
+  done
+}
+
+# Add some common places.
+add_to_PATH /opt/bin /usr/local/bin /usr/local/sbin /usr/sbin ~/.local/bin
+
 # User/root variables definition.
 if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
   debian_chroot=$(cat /etc/debian_chroot)
@@ -45,7 +60,7 @@ fi
 export BASH_SILENCE_DEPRECATION_WARNING=1
 
 # Set color profile.
-# export TERM=xterm-256color
+export TERM=xterm-256color
 force_color_prompt=yes
 
 # Colored XTERM promp.
@@ -65,27 +80,28 @@ if [ -n "$force_color_prompt" ]; then
 fi
 
 # Color support using ~/.dircolors.
-# if [ -x /usr/bin/dircolors ]; then
-#   test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" \
-#     || eval "$(dircolors -b)"
-# fi
+if [ -x /usr/bin/dircolors ]; then
+  test -r ~/.dircolors && (eval "$(dircolors -b ~/.dircolors)" \
+    || eval "$(dircolors -b)")
+fi
 
 # Set up powerline-shell (https://github.com/b-ryan/powerline-shell).
-# _update_ps1() {
-#   PS1=$(powerline-shell $?)  # Or wherever it's installed.
-# }
-# if [[ $TERM != linux && ! $PROMPT_COMMAND =~ _update_ps1 ]]; then
-#   PROMPT_COMMAND="_update_ps1; $PROMPT_COMMAND"
-# fi
+if type "powerline-shell" > /dev/null ; then
+  _update_ps1() {
+    PS1=$(powerline-shell $?)  # Or wherever it's installed.
+  }
+  if [[ $TERM != linux && ! $PROMPT_COMMAND =~ _update_ps1 ]]; then
+    PROMPT_COMMAND="_update_ps1; $PROMPT_COMMAND"
+  fi
+fi
 
 #----------------------------#
 #       Useful Aliases       #
 #----------------------------#
 
-# Uncomment if you have aliases defined separately.
-# if [ -f ~/.bash_aliases ]; then
-#   . ~/.bash_aliases
-# fi
+if [ -f ~/.bash_aliases ]; then
+  . ~/.bash_aliases
+fi
 
 # Prompt before removing, copying, or moving
 alias rm="rm -i"
@@ -258,19 +274,3 @@ killps() {
     fi
   done
 }
-
-# Adds variable to $PATH, canonicalizing simlinks and non-existent directories.
-# https://unix.stackexchange.com/a/4973
-add_to_PATH() {
-  for d; do
-    d=$({ cd -- "$d" && { pwd -P || pwd; } } 2>/dev/null)
-    if [ -z "$d" ]; then continue; fi
-    case ":$PATH:" in
-      *":$d:"*) : ;;
-             *) PATH=$PATH:$d ;;
-    esac
-  done
-}
-
-# Add some common places.
-add_to_PATH /opt/bin /usr/local/bin /usr/local/sbin /usr/sbin ~/.local/bin
