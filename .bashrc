@@ -24,7 +24,7 @@ shopt | grep -q '^checkwinsize\b' && shopt -s checkwinsize
 shopt | grep -q '^autocd\b' && shopt -s autocd
 
 # Use ** in pathname expansions to match all files and zero or more directories
-# and subdirectories. On Mac, you may need to switch to Homebrew's bash.
+# and subdirectories. On macOS, you may need to switch to Homebrew's bash.
 shopt | grep -q '^globstar\b' && shopt -s globstar
 
 # User/root variables definition.
@@ -40,6 +40,9 @@ if ! shopt -oq posix; then
     . /etc/bash_completion
   fi
 fi
+
+# Silence the upgrade to zsh message on macOS.
+export BASH_SILENCE_DEPRECATION_WARNING=1
 
 # Set color profile.
 # export TERM=xterm-256color
@@ -61,27 +64,28 @@ if [ -n "$force_color_prompt" ]; then
   fi
 fi
 
-# Powerline Shell (See: https://github.com/b-ryan/powerline-shell)
-# function _update_ps1() {
+# Color support using ~/.dircolors.
+# if [ -x /usr/bin/dircolors ]; then
+#   test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" \
+#     || eval "$(dircolors -b)"
+# fi
+
+# Set up powerline-shell (https://github.com/b-ryan/powerline-shell).
+# _update_ps1() {
 #   PS1=$(powerline-shell $?)  # Or wherever it's installed.
 # }
 # if [[ $TERM != linux && ! $PROMPT_COMMAND =~ _update_ps1 ]]; then
 #   PROMPT_COMMAND="_update_ps1; $PROMPT_COMMAND"
 # fi
 
-# Color support using ~/.dircolors.
-# if [ -x /usr/bin/dircolors ]; then
-#   test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
-# fi
-
-# Alias definitions, if you choose to define it separately.
-# if [ -f ~/.bash_aliases ]; then
-#   . ~/.bash_aliases
-# fi
-
 #----------------------------#
 #       Useful Aliases       #
 #----------------------------#
+
+# Uncomment if you have aliases defined separately.
+# if [ -f ~/.bash_aliases ]; then
+#   . ~/.bash_aliases
+# fi
 
 # Prompt before removing, copying, or moving
 alias rm="rm -i"
@@ -170,14 +174,14 @@ b() {
 # Colored man pages.
 man() {
   env \
-  LESS_TERMCAP_mb="$(printf "\e[1;31m")" \
-  LESS_TERMCAP_md="$(printf "\e[1;31m")" \
-  LESS_TERMCAP_me="$(printf "\e[0m")" \
-  LESS_TERMCAP_se="$(printf "\e[0m")" \
-  LESS_TERMCAP_so="$(printf "\e[1;44;33m")" \
-  LESS_TERMCAP_ue="$(printf "\e[0m")" \
-  LESS_TERMCAP_us="$(printf "\e[1;32m")" \
-  man "$@"
+    LESS_TERMCAP_mb="$(printf "\e[1;31m")" \
+    LESS_TERMCAP_md="$(printf "\e[1;31m")" \
+    LESS_TERMCAP_me="$(printf "\e[0m")" \
+    LESS_TERMCAP_se="$(printf "\e[0m")" \
+    LESS_TERMCAP_so="$(printf "\e[1;44;33m")" \
+    LESS_TERMCAP_ue="$(printf "\e[0m")" \
+    LESS_TERMCAP_us="$(printf "\e[1;32m")" \
+    man "$@"
 }
 
 # Extract archives (respective programs must be installed).
@@ -226,7 +230,7 @@ Usage: fstr [-i] \"pattern\" [\"filename pattern\"] "
     return;
   fi
   find . -type f -name "${2:-*}" -print0 | \
-xargs -0 egrep --color=always -sn "${mycase}" "$1" 2>&- | more
+    xargs -0 egrep --color=always -sn "${mycase}" "$1" 2>&- | more
 }
 
 # Creates an archive (*.tar.gz) from given directory.
@@ -262,8 +266,8 @@ add_to_PATH() {
     d=$({ cd -- "$d" && { pwd -P || pwd; } } 2>/dev/null)
     if [ -z "$d" ]; then continue; fi
     case ":$PATH:" in
-      *":$d:"*) :;;
-      *) PATH=$PATH:$d;;
+      *":$d:"*) : ;;
+             *) PATH=$PATH:$d ;;
     esac
   done
 }
