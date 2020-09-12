@@ -7,18 +7,18 @@
 {
   "path": "C:\\MinGW\\bin\\",
   "cmd": [
-    "g++", "${file_name}", "-O2", "-o", "tmp.exe",
+    "g++", "${file_name}", "-O2", "-o", "${file_base_name}.exe",
     "-std=gnu++11",                   /* Uncomment to enable C++11. */
     "-pedantic", "-Wno-long-long",    /* Warn about ISO compliancy. */
     "-Wall",             /* Comment if you don't want any warnings. */
     "-Wl,--stack,536870912",             /* Stack limit to 512 MiB. */
     "&&", // "start", "",  /* Uncomment to run in external console. */
-    "tmp.exe"
+    "${file_base_name}.exe"
   ],
   "variants": [
     {
       "name": "clean",
-      "cmd": ["del", "tmp.exe"],
+      "cmd": ["del", "${file_base_name}.exe"],
       "shell": true
     }
   ],
