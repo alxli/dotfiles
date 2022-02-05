@@ -1,6 +1,6 @@
 /*
   C++ build system for temporary, singleton programs (Windows version).
-  In Sublime Text 3, go to "Tools > Build System > New Build System" to add.
+  In Sublime Text, go to "Tools > Build System > New Build System" to add.
   Ctrl+B to build and run. Ctrl+Shift+B and select "clean" to clean files.
 */
 
@@ -8,7 +8,7 @@
   "path": "C:\\MinGW\\bin\\",
   "cmd": [
     "g++", "${file_name}", "-O2", "-o", "${file_base_name}.exe",
-    "-std=gnu++11",                   /* Uncomment to enable C++11. */
+    "-std=gnu++20",                                /* Enable C++20. */
     "-pedantic", "-Wno-long-long",    /* Warn about ISO compliancy. */
     "-Wall",             /* Comment if you don't want any warnings. */
     "-Wl,--stack,536870912",             /* Stack limit to 512 MiB. */
