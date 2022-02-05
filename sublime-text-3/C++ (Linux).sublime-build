@@ -1,15 +1,13 @@
 /*
-  C++ build system for singleton programs in contests (Linux version).
-  In Sublime Text 3, go to "Tools>Build System>New Build System" to add.
-  For version 3083. Default keybindings: Ctrl + B to build and run.
+  C++ build system for temporary, singleton programs (Linux version).
+  In Sublime Text, go to "Tools > Build System > New Build System" to add.
+  Ctrl+B to build and run. Ctrl+Shift+B and select "clean" to clean files.
 */
 
 {
   "path": "/usr/bin/",
   "cmd" : [
-    "g++ ${file_name} -O2 -Wall -o ${file_base_name} && ./${file_base_name}",
-    //"g++ ${file_name} -O2 -o ${file_base_name} && ./${file_base_name}",
-    //"g++ ${file_name} -O2 -std=gnu++11 -o ${file_base_name} && ./${file_base_name}",
+    "g++ ${file_name} -O2 -std=gnu++20 -Wall -o ${file_base_name} && ./${file_base_name}",
   ],
   "working_dir": "${file_path}",
   "selector" : "source.cpp",
