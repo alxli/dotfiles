@@ -95,6 +95,9 @@ if type "powerline-shell" > /dev/null ; then
   fi
 fi
 
+# Append to .bash_history after each command, instead of on bash exit.
+PROMPT_COMMAND="history -a; $PROMPT_COMMAND"
+
 #----------------------------#
 #       Useful Aliases       #
 #----------------------------#
@@ -133,8 +136,8 @@ alias printpath='echo -e ${PATH//:/\\n}'
 # 'ls' family
 # Add colors for filetype and human-readable sizes by default on 'ls'.
 if [ "$(uname)" == "Darwin" ]; then
-  # For colors on Mac, we need to install gls using `brew install coreutils`
-  alias ls='gls -h --color=auto'
+  # For colors on Mac, must install gls using `brew install coreutils`.
+  alias ls='~/homebrew/opt/coreutils/libexec/gnubin/ls -h --color=auto'
 else
   alias ls='ls -h --color=auto'
 fi
@@ -273,4 +276,32 @@ killps() {
       then kill "$sig" "$pid"
     fi
   done
+}
+
+# (Useful for competitive programming)
+# Build and run a C++ file, showing execution time and exit code.
+# Usage: cpprun srcfile [arg2] ... [arg99] [<file.in] [>file.out]
+# Example: cpprun code.cpp <file.in >file.out  (specifying .cpp is optional)
+cpprun() {
+  basepath="${1%%.*}"  # Strip extension.
+  [[ "$1" == "$basepath" ]] && srcpath="$basepath".cpp || srcpath=$1
+  # Change the build command and arguments below as you like it it.
+  # On Mac, `gcc` is likely just a clang shim and won't have bits/stdc++.h.
+  # Install the real GCC with `brew install gcc` and invoke with `g++-12`.
+  g++-13 "$srcpath" -o "$basepath" -O3 -std=gnu++17 -Wl,-stack_size -Wl,20000000 -Wall -Wno-variadic-macros
+  status=$?
+  if [ $status -eq 0 ]; then
+    # On Mac, must run `brew install coreutils`
+    [[ "$(uname)" == "Darwin" ]] && start=$(gdate +%s.%N) || start=$(date +%s.%N)
+    # Check if argument is a path, else run in current directory.
+    [[ "$basepath" == *\/* ]] && "$basepath" "${@:2:99}" || ./"$basepath" "${@:2:99}"
+    status=$?
+    [[ "$(uname)" == "Darwin" ]] && end=$(gdate +%s.%N) || end=$(date +%s.%N)
+    runtime=$(python -c "print('{0:.0f}m {1:.3f}s'.format(*divmod(${end}-${start},60)))")
+    echo "Finished in $runtime with exit code ${status}." >&2
+    return $status
+  else
+    echo "Build failed" >&2
+    return $status
+  fi
 }
