@@ -261,27 +261,6 @@ makezip() { zip -r "${1%%/}.zip" "$1" ; }
 # Make your directories and files access rights sane.
 sanitize() { chmod -R u=rwX,g=rX,o= "$@" ; }
 
-# Print process info.
-my_ps() { ps $@ -u $USER -o pid,%cpu,%mem,bsdtime,command ; }
-pp() { my_ps f | awk '!/awk/ && $0~var' var=${1:-".*"} ; }
-
-# Kill by process name.
-killps() {
-  local pid pname sig="-TERM"  # Default signal.
-  if [ "$#" -lt 1 ] || [ "$#" -gt 2 ]; then
-    echo "Usage: killps [-SIGNAL] pattern"
-    return;
-  fi
-  if [ $# = 2 ]; then sig=$1 ; fi
-  for pid in $(my_ps | awk '!/awk/ && $0~pat { print $1 }' pat=${!#} )
-  do
-    pname=$(my_ps | awk '$1~var { print $5 }' var="$pid" )
-    if ask "Kill process $pid <$pname> with signal $sig?"
-      then kill "$sig" "$pid"
-    fi
-  done
-}
-
 # Pretty-print of 'df' output. Inspired by 'dfc' utility.
 mydf() {
   for fs ; do
@@ -306,7 +285,7 @@ mydf() {
 }
 
 # Get IP adress on ethernet.
-my_ip() {
+eth0_ip() {
   MY_IP=$(/sbin/ifconfig eth0 | awk '/inet/ { print $2 } ' |
     sed -e s/addr://)
   echo ${MY_IP:-"Not connected"}
@@ -322,7 +301,7 @@ ii() {
   echo -e "\n${BRed}Machine stats :$NC " ; uptime
   echo -e "\n${BRed}Memory stats :$NC " ; free
   echo -e "\n${BRed}Diskspace :$NC " ; mydf / $HOME
-  echo -e "\n${BRed}Local IP Address :$NC" ; my_ip
+  echo -e "\n${BRed}Local IP Address :$NC" ; eth0_ip
   echo -e "\n${BRed}Open connections :$NC "; netstat -pan --inet;
   echo
 }
