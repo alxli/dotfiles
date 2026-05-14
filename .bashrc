@@ -365,13 +365,15 @@ mydf() {
   done
 }
 
-# Show primary local IP address (works on Linux and macOS).
+# Show primary local IP address (IPv4 preferred, IPv6 fallback).
 myip() {
   local ip
   if command -v ip &>/dev/null; then
     ip=$(ip -4 route get 1.1.1.1 2>/dev/null | awk '{for(i=1;i<=NF;i++) if($i=="src") print $(i+1)}')
+    [ -z "$ip" ] && ip=$(ip -6 route get 2001:4860:4860::8888 2>/dev/null | awk '{for(i=1;i<=NF;i++) if($i=="src") print $(i+1)}')
   elif command -v ifconfig &>/dev/null; then
     ip=$(ifconfig | awk '/inet / && !/127.0.0.1/{print $2; exit}' | sed 's/addr://')
+    [ -z "$ip" ] && ip=$(ifconfig | awk '/inet6 / && !/fe80::/ && !/::1/{print $2; exit}')
   fi
   echo "${ip:-Not connected}"
 }
