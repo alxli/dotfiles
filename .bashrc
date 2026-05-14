@@ -9,7 +9,7 @@ case $- in
 esac
 
 #============================================================#
-#                     Shell Options                           #
+#                     Shell Options                          #
 #============================================================#
 
 # Don't put duplicate lines or lines starting with space in the history.
@@ -42,7 +42,7 @@ shopt -s cdspell 2>/dev/null
 shopt -s dirspell 2>/dev/null
 
 #============================================================#
-#                         PATH                                #
+#                         PATH                               #
 #============================================================#
 
 # Add a directory to $PATH if it exists and isn't already present.
@@ -72,7 +72,7 @@ prepend_to_PATH() {
 }
 
 #============================================================#
-#              Your Custom PATH & Exports                     #
+#              Your Custom PATH & Exports                    #
 #============================================================#
 
 # Common defaults (non-existent paths are silently skipped).
@@ -89,7 +89,7 @@ fi
 # Add your own directories and environment variables below.
 
 #============================================================#
-#                    Completion                               #
+#                    Completion                              #
 #============================================================#
 
 if ! shopt -oq posix; then
@@ -105,7 +105,7 @@ if ! shopt -oq posix; then
 fi
 
 #============================================================#
-#                   Terminal & Colors                         #
+#                   Terminal & Colors                        #
 #============================================================#
 
 # Silence the macOS "default interactive shell is now zsh" message.
@@ -136,7 +136,7 @@ if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
 fi
 
 #============================================================#
-#                      Prompt                                 #
+#                      Prompt                                #
 #============================================================#
 
 # Uses the first fancy prompt found, falling back to a simple colored prompt.
@@ -188,14 +188,14 @@ fi
 PROMPT_COMMAND="history -a; ${PROMPT_COMMAND:-}"
 
 #============================================================#
-#                       Editor                                #
+#                       Editor                               #
 #============================================================#
 
 export VISUAL=vim
 export EDITOR="$VISUAL"
 
 #============================================================#
-#                       Aliases                               #
+#                       Aliases                              #
 #============================================================#
 
 # Source a separate aliases file if it exists.
@@ -247,7 +247,7 @@ command -v pacman  &>/dev/null && alias pacup="sudo pacman -Syu"
 command -v brew    &>/dev/null && alias brewup="brew update && brew upgrade"
 
 #============================================================#
-#                      Functions                              #
+#                      Functions                             #
 #============================================================#
 
 # ---- Navigation ----
@@ -495,7 +495,7 @@ gcap() {
 }
 
 #============================================================#
-#                 Local Overrides                             #
+#                 Local Overrides                            #
 #============================================================#
 
 # Source machine-specific config last. Put host-specific or private
