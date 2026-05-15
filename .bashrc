@@ -143,6 +143,7 @@ fi
 # NOTE: Most of these prompts need a Nerd Font for icons/glyphs to render.
 #   Install one from https://www.nerdfonts.com (e.g. "MesloLGS NF") and set
 #   it as your terminal's font (iTerm2: Preferences > Profiles > Text > Font).
+#   On macOS: brew install --cask font-meslo-lg-nerd-font
 # NOTE: On macOS, stock bash is v3.2 — oh-my-posh and starship need bash 4+.
 #   Upgrade with: brew install bash
 #   Then register: echo "$(brew --prefix)/bin/bash" | sudo tee -a /etc/shells
