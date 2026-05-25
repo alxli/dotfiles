@@ -155,35 +155,58 @@ fi
 #   starship:        curl -sS https://starship.rs/install.sh | sh
 #   powerline-go:    go install github.com/justjanne/powerline-go@latest
 #   powerline-shell: pipx install powerline-shell
+# Simple prompt fallback used when optional prompt tools are missing or broken.
+_set_basic_ps1() {
+  PS1='\[\e[1;32m\]\u@\h\[\e[0m\]:\[\e[1;34m\]\w\[\e[0m\]\$ '
+}
+
 if command -v oh-my-posh &>/dev/null; then
   if (( BASH_VERSINFO[0] >= 4 )); then
-    eval "$(oh-my-posh init bash)"
     # Browse themes: https://ohmyposh.dev/docs/themes
-    # eval "$(oh-my-posh init bash --config ~/.cache/oh-my-posh/themes/jblab_2021.omp.json)"
+    # To persist a specific theme, replace the _prompt_init line above with:
+    # if _prompt_init=$(oh-my-posh init bash --config "$HOME/.cache/oh-my-posh/themes/jblab_2021.omp.json" 2>/dev/null); then
+    if _prompt_init=$(oh-my-posh init bash 2>/dev/null); then
+      eval "$_prompt_init"
+    else
+      _set_basic_ps1
+    fi
   else
     echo "oh-my-posh requires bash 4+. You have bash $BASH_VERSION." >&2
     echo "  Upgrade: brew install bash" >&2
     echo "  Then:    echo \"\$(brew --prefix)/bin/bash\" | sudo tee -a /etc/shells" >&2
     echo "           chsh -s \"\$(brew --prefix)/bin/bash\"" >&2
+    _set_basic_ps1
   fi
 elif command -v starship &>/dev/null; then
-  eval "$(starship init bash)"
-elif command -v powerline-go &>/dev/null; then
+  if _prompt_init=$(starship init bash 2>/dev/null); then
+    eval "$_prompt_init"
+  else
+    _set_basic_ps1
+  fi
+elif command -v powerline-go &>/dev/null && powerline-go -error 0 -jobs 0 >/dev/null 2>&1; then
   _update_ps1() {
-    PS1=$(powerline-go -error $? -jobs "$(jobs -p | wc -l)")
+    local status=$? prompt
+    prompt=$(powerline-go -error "$status" -jobs "$(jobs -p | wc -l)" 2>/dev/null) \
+      && PS1="$prompt" \
+      || _set_basic_ps1
+    return "$status"
   }
   [[ "$TERM" != linux && ! "${PROMPT_COMMAND:-}" =~ _update_ps1 ]] \
     && PROMPT_COMMAND="_update_ps1; ${PROMPT_COMMAND:-}"
-elif command -v powerline-shell &>/dev/null; then
+elif command -v powerline-shell &>/dev/null && powerline-shell 0 >/dev/null 2>&1; then
   _update_ps1() {
-    PS1=$(powerline-shell $?)
+    local status=$? prompt
+    prompt=$(powerline-shell "$status" 2>/dev/null) \
+      && PS1="$prompt" \
+      || _set_basic_ps1
+    return "$status"
   }
   [[ "$TERM" != linux && ! "${PROMPT_COMMAND:-}" =~ _update_ps1 ]] \
     && PROMPT_COMMAND="_update_ps1; ${PROMPT_COMMAND:-}"
 else
-  # Simple colored fallback: user@host:dir$
-  PS1='\[\e[1;32m\]\u@\h\[\e[0m\]:\[\e[1;34m\]\w\[\e[0m\]\$ '
+  _set_basic_ps1
 fi
+unset _prompt_init
 
 # Flush each command to ~/.bash_history immediately (survives crashes).
 PROMPT_COMMAND="history -a; ${PROMPT_COMMAND:-}"
