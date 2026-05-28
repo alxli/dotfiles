@@ -140,10 +140,6 @@ fi
 #============================================================#
 
 # Uses the first fancy prompt found, falling back to a simple colored prompt.
-# NOTE: Most of these prompts need a Nerd Font for icons/glyphs to render.
-#   Install one from https://www.nerdfonts.com (e.g. "MesloLGS NF") and set
-#   it as your terminal's font (iTerm2: Preferences > Profiles > Text > Font).
-#   On macOS: brew install --cask font-meslo-lg-nerd-font
 # NOTE: On macOS, stock bash is v3.2 — oh-my-posh and starship need bash 4+.
 #   Upgrade with: brew install bash
 #   Then register: echo "$(brew --prefix)/bin/bash" | sudo tee -a /etc/shells
@@ -155,7 +151,10 @@ fi
 #   starship:        curl -sS https://starship.rs/install.sh | sh
 #   powerline-go:    go install github.com/justjanne/powerline-go@latest
 #   powerline-shell: pipx install powerline-shell
-# Simple prompt fallback used when optional prompt tools are missing or broken.
+# NOTE: Most of these prompts need a Nerd Font for icons/glyphs to render.
+#   Install one from https://www.nerdfonts.com (e.g. "MesloLGS NF") and set
+#   it as your terminal's font (iTerm2: Settings > Profiles > Text > Font).
+#   On macOS: brew install --cask font-meslo-lg-nerd-font
 _set_basic_ps1() {
   PS1='\[\e[1;32m\]\u@\h\[\e[0m\]:\[\e[1;34m\]\w\[\e[0m\]\$ '
 }
