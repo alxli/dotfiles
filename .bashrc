@@ -487,7 +487,8 @@ sanitize() { chmod -R u=rwX,g=rX,o= "$@"; }
 
 # Build and run a C++ file, showing execution time and exit code.
 # Usage: cpprun file.cpp [args...] [<input] [>output]
-# Useful for competitive programming. Detects g++ / c++ automatically.
+# Useful for competitive programming. On macOS, prefer `brew install gcc` over
+# the built in Apple Clang, so stuff like <bits/stdc++.h> work.
 cpprun() {
   [ -z "$1" ] && { echo "Usage: cpprun <file[.cpp]> [args...]"; return 1; }
   local basepath="${1%%.*}"
@@ -496,12 +497,15 @@ cpprun() {
   [ ! -f "$srcpath" ] && { echo "File not found: $srcpath"; return 1; }
 
   local CXX
-  for CXX in g++ c++ clang++; do
-    command -v "$CXX" &>/dev/null && break
-  done
+  CXX=$(printf '%s\n' /opt/homebrew/bin/g++-[0-9]* 2>/dev/null | sort -rV | head -1)
+  if ! command -v "$CXX" &>/dev/null; then
+    for CXX in g++ c++ clang++; do
+      command -v "$CXX" &>/dev/null && break
+    done
+  fi
   command -v "$CXX" &>/dev/null || { echo "No C++ compiler found."; return 1; }
 
-  "$CXX" "$srcpath" -o "$basepath" -O2 -std=c++17 -Wall \
+  "$CXX" "$srcpath" -o "$basepath" -O2 -std=c++20 -Wall \
     || { echo "Build failed." >&2; return 1; }
 
   local start_s=$SECONDS status
@@ -525,4 +529,6 @@ gcap() {
 
 # Source machine-specific config last. Put host-specific or private
 # settings (API keys, work aliases, etc.) here instead of this file.
-[ -f "$HOME/.bashrc.local" ] && . "$HOME/.bashrc.local"
+if [ -f "$HOME/.bashrc.local" ]; then
+    . "$HOME/.bashrc.local"
+fi
