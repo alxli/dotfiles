@@ -221,6 +221,11 @@ esac
 export VISUAL=vim
 export EDITOR="$VISUAL"
 
+# --- Editors and configs ---
+alias suedit='sudo "$VISUAL"'
+alias fstab='sudo "$VISUAL" /etc/fstab'
+alias grubcfg='sudo "$VISUAL" /etc/default/grub'
+
 #============================================================#
 #                       Aliases                              #
 #============================================================#
@@ -255,8 +260,10 @@ else
   alias ll='ls -lv'
 fi
 alias la='ll -A'            # Include hidden files.
-alias lt='ls -ltr'          # Sort by date, most recent last.
 alias lk='ls -lSr'          # Sort by size, biggest last.
+alias lt='ls -ltr'          # Sort by date, most recent last.
+alias lc='ls -ltcr'         # Sort by/show change time, most recent last.
+alias lu='ls -ltur'         # Sort by/show access time, most recent last.
 alias lr='ll -R'            # Recursive listing.
 
 # --- grep with color ---
@@ -440,6 +447,13 @@ killport() {
   for pid in $pids; do
     kill -s "$sig" "$pid" 2>/dev/null && echo "Killed PID $pid (SIG$sig)" || echo "Failed to kill PID $pid" >&2
   done
+}
+
+# Copy a file back to the SSH client's Downloads folder.
+dl() {
+  [ -z "${SSH_CLIENT:-}" ] && { echo "SSH_CLIENT is not set."; return 1; }
+  [ -z "$1" ] && { echo "Usage: dl <file>"; return 1; }
+  scp "$1" "$USER@[${SSH_CLIENT%% *}]:/home/$USER/Downloads"
 }
 
 # ---- Files & Directories ----
