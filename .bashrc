@@ -162,7 +162,7 @@ _set_basic_ps1() {
 if command -v oh-my-posh &>/dev/null; then
   if (( BASH_VERSINFO[0] >= 4 )); then
     # Browse themes: https://ohmyposh.dev/docs/themes
-    # To persist a specific theme, replace the _prompt_init line above with:
+    # To persist a specific theme, replace the _prompt_init line below with:
     # if _prompt_init=$(oh-my-posh init bash --config "$HOME/.cache/oh-my-posh/themes/jblab_2021.omp.json" 2>/dev/null); then
     if _prompt_init=$(oh-my-posh init bash 2>/dev/null); then
       eval "$_prompt_init"
@@ -208,7 +208,11 @@ fi
 unset _prompt_init
 
 # Flush each command to ~/.bash_history immediately (survives crashes).
-PROMPT_COMMAND="history -a; ${PROMPT_COMMAND:-}"
+# Append so prompt hooks can still inspect the previous command's exit status.
+case ";${PROMPT_COMMAND:-};" in
+  *";history -a;"*) ;;
+  *) PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND; }history -a" ;;
+esac
 
 #============================================================#
 #                       Editor                               #
