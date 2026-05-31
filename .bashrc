@@ -209,10 +209,9 @@ unset _prompt_init
 
 # Flush each command to ~/.bash_history immediately (survives crashes).
 # Append so prompt hooks can still inspect the previous command's exit status.
-case ";${PROMPT_COMMAND:-};" in
-  *";history -a;"*) ;;
-  *) PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND; }history -a" ;;
-esac
+if [[ ! ";${PROMPT_COMMAND:-};" =~ \;[[:space:]]*history[[:space:]]+-a[[:space:]]*\; ]]; then
+  PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND; }history -a"
+fi
 
 #============================================================#
 #                       Editor                               #
