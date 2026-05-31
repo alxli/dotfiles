@@ -2,9 +2,7 @@
 
 Config files and utility scripts for macOS, with partial GNU/Linux support.
 
-The install commands below download individual files directly from GitHub. A
-full clone is not required. Review remote scripts before running them if you
-are installing on a new machine.
+The install commands below download individual files directly from GitHub. A full clone is not required. Review remote scripts before running them if you are installing on a new machine.
 
 ## Shell
 
@@ -12,18 +10,14 @@ are installing on a new machine.
 - **`.bashrc`** is a portable Bash config for macOS and Linux. It includes:
   - Shell options: large history, `autocd`, `globstar`, and spelling correction
   - `$PATH` helpers: `prepend_to_PATH` and `append_to_PATH`
-  - Prompt auto-detection for oh-my-posh, starship, powerline-go, and
-    powerline-shell, with a colored fallback prompt
-  - Safer aliases, navigation shortcuts, colorized `ls` and `grep`, and package
-    manager shortcuts
-  - Utility functions including `mkcd`, `up`, `ff`, `fd`, `extract`, `cpprun`,
-    `killport`, `dl`, `sysinfo`, `trash`, `backup`, and `gcap`
+  - Prompt auto-detection for oh-my-posh, starship, powerline-go, and powerline-shell, with a colored fallback prompt
+  - Safer aliases, navigation shortcuts, colorized `ls` and `grep`, and package manager shortcuts
+  - Utility functions including `mkcd`, `up`, `ff`, `fd`, `extract`, `cpprun`, `killport`, `dl`, `sysinfo`, `trash`, `backup`, and `gcap`
   - A final `~/.bashrc.local` include for machine-specific settings
 
 ### Install or replace the shell config
 
-Use this when your custom settings are already isolated in `~/.bashrc.local`.
-It replaces `~/.bashrc` and `~/.bash_profile` with the latest remote versions:
+Use this when your custom settings are already isolated in `~/.bashrc.local`. It replaces `~/.bashrc` and `~/.bash_profile` with the latest remote versions:
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/alxli/dotfiles/master/.bashrc \
@@ -69,9 +63,7 @@ curl -s https://ohmyposh.dev/install.sh | bash -s -- -d "$HOME/.local/bin"
 
 ## iTerm2
 
-- **`iterm2_preset.json`** is an iTerm2 profile preset with a black background,
-  green-on-black text, Meslo Nerd Font, Homebrew Bash, Option-as-Meta key
-  mappings, and `xterm-256color`.
+- **`iterm2_preset.json`** is an iTerm2 profile preset with a black background, green-on-black text, Meslo Nerd Font, Homebrew Bash, Option-as-Meta key mappings, and `xterm-256color`.
 
 Download the preset:
 
@@ -85,9 +77,7 @@ Profiles** to import `~/Downloads/iterm2_preset.json`.
 
 ## macOS Default Apps
 
-- **`set_mac_defaults.swift`** sets default apps by file extension. The tracked
-  defaults include MarkEdit for Markdown, Sublime Text for code and text files,
-  and Elmedia Player for media. Edit the script if your preferred apps differ.
+- **`set_mac_defaults.swift`** sets default apps by file extension. The tracked defaults include MarkEdit for Markdown, Sublime Text for code and text files, and Elmedia Player for media. Edit the script if your preferred apps differ.
 
 Download, review, and run it:
 
@@ -106,9 +96,7 @@ osascript -e 'id of app "App Name"'
 
 ## Toggle Dock Position
 
-- **`toggle_dock_position/`** builds a macOS app that toggles the Dock between
-  its left and bottom positions. The installer writes the app to
-  `/Applications/Toggle Dock Position.app` and requests admin privileges.
+- **`toggle_dock_position/`** builds a macOS app that toggles the Dock between its left and bottom positions. The installer writes the app to `/Applications/Toggle Dock Position.app` and requests admin privileges.
 
 Download and install it:
 
@@ -120,10 +108,31 @@ curl -fsSL https://github.com/alxli/dotfiles/archive/refs/heads/master.tar.gz \
 
 After installation, drag the app from `/Applications` to the Dock.
 
+## Hammerspoon Middle-Click Drag Scroll
+
+- **`.hammerspoon/init.lua`** initializes [MiddleClickDragScroll](https://github.com/benediktwerner/MiddleClickDragScroll.spoon), which adds Windows-like middle-click drag scrolling system-wide on macOS.
+
+Install Hammerspoon, the spoon, and this config:
+
+```sh
+brew install --cask hammerspoon
+mkdir -p "$HOME/.hammerspoon/Spoons"
+spoon="$HOME/.hammerspoon/Spoons/MiddleClickDragScroll.spoon"
+if test -d "$spoon/.git"; then
+  git -C "$spoon" pull --ff-only
+else
+  git clone https://github.com/benediktwerner/MiddleClickDragScroll.spoon.git "$spoon"
+fi
+curl -fsSL https://raw.githubusercontent.com/alxli/dotfiles/master/.hammerspoon/init.lua \
+  -o "$HOME/.hammerspoon/init.lua"
+open -a Hammerspoon
+```
+
+The `curl` command replaces any existing `~/.hammerspoon/init.lua`. Merge the template manually instead if that file already contains custom Hammerspoon configuration. Grant Hammerspoon Accessibility access when macOS prompts for it.
+
 ## Vim
 
-- **`.vimrc`** configures the Molokai color scheme, 4-space tabs, line numbers,
-  smart search, mouse support, `jk` to escape, and clipboard integration.
+- **`.vimrc`** configures the Molokai color scheme, 4-space tabs, line numbers, smart search, mouse support, `jk` to escape, and clipboard integration.
 - **`.vim/colors/molokai.vim`** installs the Molokai color scheme.
 
 Install both files:
@@ -138,9 +147,7 @@ curl -fsSL https://raw.githubusercontent.com/alxli/dotfiles/master/.vim/colors/m
 
 ## Sublime Text
 
-- **`Sublime Text/Packages/User/Preferences.sublime-settings`** configures the
-  Monokai theme, 2-space tabs, an 80-character ruler, trailing-whitespace
-  trimming, and UTF-8 defaults.
+- **`Sublime Text/Packages/User/Preferences.sublime-settings`** configures the Monokai theme, 2-space tabs, an 80-character ruler, trailing-whitespace trimming, and UTF-8 defaults.
 
 Install the preferences on macOS:
 

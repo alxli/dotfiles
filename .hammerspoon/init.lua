@@ -1,0 +1,17 @@
+-- Install Hammerspoon and this config from Terminal:
+--
+--   brew install --cask hammerspoon
+--   mkdir -p "$HOME/.hammerspoon/Spoons"
+--   spoon="$HOME/.hammerspoon/Spoons/MiddleClickDragScroll.spoon"
+--   if test -d "$spoon/.git"; then
+--     git -C "$spoon" pull --ff-only
+--   else
+--     git clone https://github.com/benediktwerner/MiddleClickDragScroll.spoon.git "$spoon"
+--   fi
+--   curl -fsSL https://raw.githubusercontent.com/alxli/dotfiles/master/.hammerspoon/init.lua \
+--     -o "$HOME/.hammerspoon/init.lua"
+--   open -a Hammerspoon
+--
+-- Grant Hammerspoon Accessibility access when macOS prompts for it. This
+-- enables Windows-like middle-click drag scrolling system-wide.
+local MiddleClickDragScroll = hs.loadSpoon("MiddleClickDragScroll"):start()
