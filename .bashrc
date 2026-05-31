@@ -49,7 +49,7 @@ shopt -s dirspell 2>/dev/null
 # Resolves symlinks via pwd -P.
 append_to_PATH() {
   for d; do
-    d=$({ cd -- "$d" && { pwd -P || pwd; } } 2>/dev/null)
+    d=$({ builtin cd -- "$d" && { pwd -P || pwd; } } 2>/dev/null)
     [ -z "$d" ] && continue
     case ":$PATH:" in
       *":$d:"*) ;;
@@ -62,7 +62,7 @@ append_to_PATH() {
 prepend_to_PATH() {
   for (( idx=$#; idx>0; idx-- )); do
     d=${!idx}
-    d=$({ cd -- "$d" && { pwd -P || pwd; } } 2>/dev/null)
+    d=$({ builtin cd -- "$d" && { pwd -P || pwd; } } 2>/dev/null)
     [ -z "$d" ] && continue
     case ":$PATH:" in
       *":$d:"*) ;;
