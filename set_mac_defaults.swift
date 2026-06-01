@@ -46,6 +46,8 @@ let defaults: [Default] = [
     // .init(bundleID: "com.sublimetext.4", ext: "ans"),
 
     // Text / programming languages
+    .init(bundleID: "com.sublimetext.4", ext: "bash"),
+    .init(bundleID: "com.sublimetext.4", ext: "sh"),
     .init(bundleID: "com.sublimetext.4", ext: "py"),
     .init(bundleID: "com.sublimetext.4", ext: "py3"),
     .init(bundleID: "com.sublimetext.4", ext: "cpp"),
@@ -57,10 +59,9 @@ let defaults: [Default] = [
     .init(bundleID: "com.sublimetext.4", ext: "tsx"),
     .init(bundleID: "com.sublimetext.4", ext: "mjs"),
     .init(bundleID: "com.sublimetext.4", ext: "css"),
-    .init(bundleID: "com.sublimetext.4", ext: "swift"),
     .init(bundleID: "com.sublimetext.4", ext: "php"),
-    .init(bundleID: "com.sublimetext.4", ext: "sh"),
-    .init(bundleID: "com.sublimetext.4", ext: "bash"),
+    .init(bundleID: "com.sublimetext.4", ext: "lua"),
+    .init(bundleID: "com.sublimetext.4", ext: "swift"),
 
     // Video
     .init(bundleID: "com.Eltima.ElmediaPlayer", ext: "mp4"),

@@ -110,7 +110,7 @@ After installation, drag the app from `/Applications` to the Dock.
 
 ## Hammerspoon Middle-Click Drag Scroll
 
-- **`.hammerspoon/init.lua`** initializes [MiddleClickDragScroll](https://github.com/benediktwerner/MiddleClickDragScroll.spoon), which adds Windows-like middle-click drag scrolling system-wide on macOS.
+- **`.hammerspoon/init.lua`** adds Windows-like middle-click drag scrolling system-wide on macOS using [MiddleClickDragScroll](https://github.com/benediktwerner/MiddleClickDragScroll.spoon). My custom init also adds a nicer indicator icon to the middle-click.
 
 Install Hammerspoon, the spoon, and this config:
 
