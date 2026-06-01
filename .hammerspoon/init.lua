@@ -47,6 +47,19 @@ local function makeScrollIndicator()
   )
 end
 
+-- Preserve native middle-click behavior in apps where it is useful for editing.
+-- Names must match hs.application.frontmostApplication():name(), not the .app
+-- filename. To look one up, run this in the Hammerspoon Console, press Enter,
+-- then focus the target app within three seconds:
+--
+--   hs.timer.doAfter(3, function() print(hs.application.frontmostApplication():name()) end)
+--
+-- For example, Visual Studio Code reports "Code".
+local middleClickBlocklist = { "Code", "Sublime Text" }
+
 local MiddleClickDragScroll = hs.loadSpoon("MiddleClickDragScroll")
-  :configure({ canvas = makeScrollIndicator() })
+  :configure({
+    canvas = makeScrollIndicator(),
+    excludedFrontmostApps = middleClickBlocklist,
+  })
   :start()
