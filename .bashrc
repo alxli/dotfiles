@@ -503,14 +503,21 @@ sanitize() { chmod -R u=rwX,g=rX,o= "$@"; }
 # ---- Development ----
 
 # Build and run a C++ file, showing execution time and exit code.
-# Usage: cpprun file.cpp [args...] [<input] [>output]
+# Usage: cpprun [--clean|-c] file.cpp [args...] [<input] [>output]
 # Useful for competitive programming. On macOS, prefer `brew install gcc` over
 # the built in Apple Clang, so stuff like <bits/stdc++.h> work.
 cpprun() {
-  [ -z "$1" ] && { echo "Usage: cpprun <file[.cpp]> [args...]"; return 1; }
-  local basepath="${1%%.*}"
-  local srcpath
-  [[ "$1" == "$basepath" ]] && srcpath="$basepath.cpp" || srcpath="$1"
+  local clean=0
+  case "$1" in
+    --clean|-c) clean=1; shift ;;
+  esac
+
+  [ -z "$1" ] && { echo "Usage: cpprun [--clean|-c] <file[.cpp]> [args...]"; return 1; }
+  local basepath srcpath
+  case "$1" in
+    *.cpp|*.cc|*.cxx|*.C) basepath="${1%.*}"; srcpath="$1" ;;
+    *) basepath="$1"; srcpath="$basepath.cpp" ;;
+  esac
   [ ! -f "$srcpath" ] && { echo "File not found: $srcpath"; return 1; }
 
   local CXX
@@ -526,8 +533,13 @@ cpprun() {
     || { echo "Build failed." >&2; return 1; }
 
   local start_s=$SECONDS status
-  [[ "$basepath" == */* ]] && "$basepath" "${@:2}" || ./"$basepath" "${@:2}"
+  if [[ "$basepath" == */* ]]; then
+    "$basepath" "${@:2}"
+  else
+    ./"$basepath" "${@:2}"
+  fi
   status=$?
+  (( clean )) && rm -f -- "$basepath"
   echo "Ran in $(( SECONDS - start_s ))s with exit code $status." >&2
   return $status
 }
