@@ -45,29 +45,52 @@ shopt -s dirspell 2>/dev/null
 #                         PATH                               #
 #============================================================#
 
-# Add a directory to $PATH if it exists and isn't already present.
 # Resolves symlinks via pwd -P.
-append_to_PATH() {
+_canonical_path_dir() {
+  local d
+  d=$({ builtin cd -- "$1" && { pwd -P || pwd; } } 2>/dev/null) || return
+  [ -n "$d" ] && printf '%s\n' "$d"
+}
+
+remove_from_PATH() {
+  local d path_part new_PATH old_IFS
+  local -a path_parts
   for d; do
-    d=$({ builtin cd -- "$d" && { pwd -P || pwd; } } 2>/dev/null)
-    [ -z "$d" ] && continue
+    d=$(_canonical_path_dir "$d") || continue
+    old_IFS=$IFS
+    IFS=:
+    read -r -a path_parts <<< "$PATH"
+    IFS=$old_IFS
+    new_PATH=
+    for path_part in "${path_parts[@]}"; do
+      [ "$path_part" = "$d" ] && continue
+      new_PATH="${new_PATH:+$new_PATH:}$path_part"
+    done
+    PATH="$new_PATH"
+  done
+}
+
+# Add a directory to the end of $PATH if it exists and isn't already present.
+append_to_PATH() {
+  local d
+  for d; do
+    d=$(_canonical_path_dir "$d") || continue
     case ":$PATH:" in
       *":$d:"*) ;;
-             *) PATH="$PATH:$d" ;;
+             *) PATH="${PATH:+$PATH:}$d" ;;
     esac
   done
 }
 
-# Iterates in reverse so argument order is preserved at the front of $PATH.
+# Move directories to the front of $PATH, preserving argument order.
+# Existing copies are removed first, so this promotes paths already in $PATH.
 prepend_to_PATH() {
+  local d idx
   for (( idx=$#; idx>0; idx-- )); do
     d=${!idx}
-    d=$({ builtin cd -- "$d" && { pwd -P || pwd; } } 2>/dev/null)
-    [ -z "$d" ] && continue
-    case ":$PATH:" in
-      *":$d:"*) ;;
-             *) PATH="$d:$PATH" ;;
-    esac
+    d=$(_canonical_path_dir "$d") || continue
+    remove_from_PATH "$d"
+    PATH="$d${PATH:+:$PATH}"
   done
 }
 
@@ -141,9 +164,9 @@ fi
 
 # Uses the first fancy prompt found, falling back to a simple colored prompt.
 # NOTE: On macOS, stock bash is v3.2 — oh-my-posh and starship need bash 4+.
-#   Upgrade with: brew install bash
-#   Then register: echo "$(brew --prefix)/bin/bash" | sudo tee -a /etc/shells
-#   And switch:    chsh -s "$(brew --prefix)/bin/bash"
+#   Upgrade with:    brew install bash
+#   Then register:   echo "$(brew --prefix)/bin/bash" | sudo tee -a /etc/shells
+#   And switch:      chsh -s "$(brew --prefix)/bin/bash"
 #   If iTerm2 still uses old bash, check Preferences > Profiles > General >
 #   Command — set to "Login shell" or point directly to Homebrew's bash.
 # Install any one of these (listed in priority order):
@@ -154,58 +177,59 @@ fi
 # NOTE: Most of these prompts need a Nerd Font for icons/glyphs to render.
 #   Install one from https://www.nerdfonts.com (e.g. "MesloLGS NF") and set
 #   it as your terminal's font (iTerm2: Settings > Profiles > Text > Font).
-#   On macOS: brew install --cask font-meslo-lg-nerd-font
+#   On macOS:        brew install --cask font-meslo-lg-nerd-font
+# Browse themes at: https://ohmyposh.dev/docs/themes
+#   To persist a theme, make sure it's downloaded and set this in .bashrc.local:
+#   OMP_CONFIG="$HOME/.cache/oh-my-posh/themes/jblab_2021.omp.json"
 _set_basic_ps1() {
   PS1='\[\e[1;32m\]\u@\h\[\e[0m\]:\[\e[1;34m\]\w\[\e[0m\]\$ '
 }
 
-if command -v oh-my-posh &>/dev/null; then
-  if (( BASH_VERSINFO[0] >= 4 )); then
-    # Browse themes: https://ohmyposh.dev/docs/themes
-    # To persist a specific theme, replace the _prompt_init line below with:
-    # if _prompt_init=$(oh-my-posh init bash --config "$HOME/.cache/oh-my-posh/themes/jblab_2021.omp.json" 2>/dev/null); then
-    if _prompt_init=$(oh-my-posh init bash 2>/dev/null); then
+_init_prompt() {
+  local _prompt_init
+
+  if command -v oh-my-posh &>/dev/null && (( BASH_VERSINFO[0] >= 4 )); then
+    if [ -n "${OMP_CONFIG:-}" ]; then
+      _prompt_init=$(oh-my-posh init bash --config "$OMP_CONFIG" 2>/dev/null)
+    else
+      _prompt_init=$(oh-my-posh init bash 2>/dev/null)
+    fi
+    if [[ "$_prompt_init" == *"_omp_hook"* || "$_prompt_init" == *"POSH_SESSION_ID"* ]]; then
       eval "$_prompt_init"
     else
       _set_basic_ps1
     fi
+  elif command -v starship &>/dev/null && (( BASH_VERSINFO[0] >= 4 )); then
+    if _prompt_init=$(starship init bash 2>/dev/null); then
+      eval "$_prompt_init"
+    else
+      _set_basic_ps1
+    fi
+  elif command -v powerline-go &>/dev/null && powerline-go -error 0 -jobs 0 >/dev/null 2>&1; then
+    _update_ps1() {
+      local status=$? prompt
+      prompt=$(powerline-go -error "$status" -jobs "$(jobs -p | wc -l)" 2>/dev/null) \
+        && PS1="$prompt" \
+        || _set_basic_ps1
+      return "$status"
+    }
+    [[ "$TERM" != linux && ! "${PROMPT_COMMAND:-}" =~ _update_ps1 ]] \
+      && PROMPT_COMMAND="_update_ps1; ${PROMPT_COMMAND:-}"
+  elif command -v powerline-shell &>/dev/null && powerline-shell 0 >/dev/null 2>&1; then
+    _update_ps1() {
+      local status=$? prompt
+      prompt=$(powerline-shell "$status" 2>/dev/null) \
+        && PS1="$prompt" \
+        || _set_basic_ps1
+      return "$status"
+    }
+    [[ "$TERM" != linux && ! "${PROMPT_COMMAND:-}" =~ _update_ps1 ]] \
+      && PROMPT_COMMAND="_update_ps1; ${PROMPT_COMMAND:-}"
   else
-    echo "oh-my-posh requires bash 4+. You have bash $BASH_VERSION." >&2
-    echo "  Upgrade: brew install bash" >&2
-    echo "  Then:    echo \"\$(brew --prefix)/bin/bash\" | sudo tee -a /etc/shells" >&2
-    echo "           chsh -s \"\$(brew --prefix)/bin/bash\"" >&2
     _set_basic_ps1
   fi
-elif command -v starship &>/dev/null; then
-  if _prompt_init=$(starship init bash 2>/dev/null); then
-    eval "$_prompt_init"
-  else
-    _set_basic_ps1
-  fi
-elif command -v powerline-go &>/dev/null && powerline-go -error 0 -jobs 0 >/dev/null 2>&1; then
-  _update_ps1() {
-    local status=$? prompt
-    prompt=$(powerline-go -error "$status" -jobs "$(jobs -p | wc -l)" 2>/dev/null) \
-      && PS1="$prompt" \
-      || _set_basic_ps1
-    return "$status"
-  }
-  [[ "$TERM" != linux && ! "${PROMPT_COMMAND:-}" =~ _update_ps1 ]] \
-    && PROMPT_COMMAND="_update_ps1; ${PROMPT_COMMAND:-}"
-elif command -v powerline-shell &>/dev/null && powerline-shell 0 >/dev/null 2>&1; then
-  _update_ps1() {
-    local status=$? prompt
-    prompt=$(powerline-shell "$status" 2>/dev/null) \
-      && PS1="$prompt" \
-      || _set_basic_ps1
-    return "$status"
-  }
-  [[ "$TERM" != linux && ! "${PROMPT_COMMAND:-}" =~ _update_ps1 ]] \
-    && PROMPT_COMMAND="_update_ps1; ${PROMPT_COMMAND:-}"
-else
-  _set_basic_ps1
-fi
-unset _prompt_init
+}
+_set_basic_ps1
 
 # Flush each command to ~/.bash_history immediately (survives crashes).
 # Append so prompt hooks can still inspect the previous command's exit status.
@@ -244,20 +268,21 @@ alias ...="cd ../.."
 alias ....="cd ../../.."
 
 # --- ls family ---
-# Detect GNU ls (supports --group-directories-first) vs BSD ls.
+# Pick the best `ls` across GNU (Linux / coreutils) and BSD (stock macOS).
 # On macOS, install GNU coreutils for the full experience: brew install coreutils
-if ls --group-directories-first / &>/dev/null 2>&1; then
-  alias ls='ls -h --color=auto --group-directories-first'
-  alias ll='ls -lv'
-elif command -v gls &>/dev/null; then
-  # GNU ls installed as 'gls' (Homebrew coreutils without gnubin in PATH).
+# Use `command ls` for detection and aliases so aliases/functions cannot
+# affect the probe or cause recursion when .bashrc is re-sourced.
+if command -v gls &>/dev/null && gls --group-directories-first / &>/dev/null; then
+  # GNU coreutils present as `gls` (e.g. Homebrew without gnubin in PATH).
   alias ls='gls -h --color=auto --group-directories-first'
-  alias ll='ls -lv'
+elif command ls --group-directories-first / &>/dev/null; then
+  # Default `ls` is GNU (typical on Linux).
+  alias ls='command ls -h --color=auto --group-directories-first'
 else
   # BSD ls (stock macOS): -G for color, no --group-directories-first.
-  alias ls='ls -hG'
-  alias ll='ls -lv'
+  alias ls='command ls -hG'
 fi
+alias ll='ls -lv'
 alias la='ll -A'            # Include hidden files.
 alias lk='ls -lSr'          # Sort by size, biggest last.
 alias lt='ls -ltr'          # Sort by date, most recent last.
@@ -298,7 +323,8 @@ mkcd() {
 
 # Go up N directories: "up 3" is equivalent to "cd ../../..".
 up() {
-  local d="" count="${1:-1}"
+  local d="" count="${1:-1}" i
+  [[ "$count" =~ ^[0-9]+$ ]] || { echo "Usage: up [count]"; return 1; }
   for ((i = 0; i < count; i++)); do d="$d../"; done
   builtin cd "$d" || return 1
 }
@@ -328,7 +354,7 @@ fstr() {
   local case_flag=""
   [ "$1" = "-i" ] && { case_flag="-i"; shift; }
   [ -z "$1" ] && { echo "Usage: fstr [-i] <pattern> [filename_pattern]"; return 1; }
-  grep -rn --color=always $case_flag -- "$1" --include="${2:-*}" . 2>/dev/null | less -R
+  grep -rn --color=always ${case_flag:+"$case_flag"} --include="${2:-*}" -- "$1" . 2>/dev/null | less -R
 }
 
 # ---- Archives ----
@@ -355,10 +381,16 @@ extract() {
 }
 
 # Create a .tar.gz archive from a file or directory.
-maketar() { tar cvzf "${1%%/}.tar.gz" "${1%%/}/"; }
+maketar() {
+  [ -z "$1" ] && { echo "Usage: maketar <file-or-dir>"; return 1; }
+  tar cvzf "${1%%/}.tar.gz" "${1%%/}/"
+}
 
 # Create a .zip archive from a file or directory.
-makezip() { zip -r "${1%%/}.zip" "$1"; }
+makezip() {
+  [ -z "$1" ] && { echo "Usage: makezip <file-or-dir>"; return 1; }
+  zip -r "${1%%/}.zip" "$1"
+}
 
 # ---- System Info ----
 
@@ -377,7 +409,7 @@ man() {
 
 # Pretty-print disk usage bar for given mount points (defaults to / and $HOME).
 mydf() {
-  local args=("$@")
+  local args=("$@") fs j
   [ ${#args[@]} -eq 0 ] && args=(/ .)
   for fs in "${args[@]}"; do
     [ ! -d "$fs" ] && { echo "$fs: No such directory"; continue; }
@@ -431,28 +463,40 @@ ports() {
   if command -v ss &>/dev/null; then
     ss -tlnp 2>/dev/null
   elif command -v lsof &>/dev/null; then
-    sudo lsof -iTCP -sTCP:LISTEN -n -P
-  else
+    if [ "$1" = "-a" ]; then
+      sudo lsof -iTCP -sTCP:LISTEN -n -P
+    else
+      lsof -iTCP -sTCP:LISTEN -n -P
+    fi
+  elif [ "$(uname)" = "Darwin" ]; then
+    netstat -anv -p tcp 2>/dev/null | grep LISTEN
+  elif command -v netstat &>/dev/null; then
     netstat -tlnp 2>/dev/null
+  else
+    echo "ports requires ss, lsof, or netstat." >&2
+    return 1
   fi
 }
 
 # Kill process(es) listening on a given port.
 killport() {
-  local port="${1:?Usage: killport <port> [signal]}" sig="${2:-TERM}"
+  local port="${1:?Usage: killport <port> [signal]}" sig="${2:-TERM}" pids pid
+  command -v lsof &>/dev/null || { echo "killport requires lsof."; return 1; }
   [[ "$port" =~ ^[0-9]+$ ]] && (( port >= 1 && port <= 65535 )) || { echo "Invalid port: $port" >&2; return 1; }
-  local pids; pids=$(lsof -ti :"$port" 2>/dev/null) || { echo "No process on port $port" >&2; return 1; }
+  pids=$(lsof -ti :"$port" 2>/dev/null) || { echo "No process on port $port" >&2; return 1; }
   lsof -i :"$port" -P -n 2>/dev/null
   for pid in $pids; do
     kill -s "$sig" "$pid" 2>/dev/null && echo "Killed PID $pid (SIG$sig)" || echo "Failed to kill PID $pid" >&2
   done
 }
 
-# Copy a file back to the SSH client's Downloads folder.
+# Copy a file back to the SSH client.
 dl() {
   [ -z "${SSH_CLIENT:-}" ] && { echo "SSH_CLIENT is not set."; return 1; }
-  [ -z "$1" ] && { echo "Usage: dl <file>"; return 1; }
-  scp "$1" "$USER@[${SSH_CLIENT%% *}]:/home/$USER/Downloads"
+  [ -z "$1" ] && { echo "Usage: dl <file> [remote_dest]"; return 1; }
+  local host="${SSH_CLIENT%% *}" dest="${2:-~/Downloads/}"
+  [[ "$host" == *:* ]] && host="[$host]"
+  scp "$1" "$USER@$host:$dest"
 }
 
 # ---- Files & Directories ----
@@ -466,15 +510,26 @@ tre() {
 # Show the N (default 5) most recently modified files, skipping hidden.
 newest() {
   local n="${1:-5}"
+  [[ "$n" =~ ^[0-9]+$ ]] || { echo "Usage: newest [count]"; return 1; }
   if stat -c '%Y' / &>/dev/null 2>&1; then
-    find . -type f ! -path '*/.*' -printf '%T@ %p\n' | sort -n | tail -n "$n" | awk '{print $2}'
+    find . -type f ! -path '*/.*' -printf '%T@ %p\0' \
+      | sort -zn \
+      | tail -z -n "$n" \
+      | cut -z -d' ' -f2- \
+      | tr '\0' '\n'
   else
     find . -type f ! -path '*/.*' -print0 | xargs -0 stat -f '%m %N' | sort -n | tail -n "$n" | cut -d' ' -f2-
   fi
 }
 
 # Show top 10 largest files/dirs in current directory.
-topsize() { command du -hs -- * 2>/dev/null | sort -rh | head -10; }
+topsize() {
+  if sort -h </dev/null &>/dev/null; then
+    command du -hs -- * 2>/dev/null | sort -rh | head -10
+  else
+    command du -ks -- * 2>/dev/null | sort -rn | head -10 | awk '{ printf "%.1fM\t%s\n", $1 / 1024, substr($0, index($0,$2)) }'
+  fi
+}
 
 # Move files to trash instead of deleting. Uses macOS Trash or freedesktop.
 trash() {
@@ -498,7 +553,10 @@ backup() {
 }
 
 # Set sane file permissions: owner rwX, group rX, others none.
-sanitize() { chmod -R u=rwX,g=rX,o= "$@"; }
+sanitize() {
+  [ $# -eq 0 ] && { echo "Usage: sanitize <path> ..."; return 1; }
+  chmod -R u=rwX,g=rX,o= "$@"
+}
 
 # ---- Development ----
 
@@ -521,12 +579,9 @@ cpprun() {
   [ ! -f "$srcpath" ] && { echo "File not found: $srcpath"; return 1; }
 
   local CXX
-  CXX=$(printf '%s\n' /opt/homebrew/bin/g++-[0-9]* 2>/dev/null | sort -rV | head -1)
-  if ! command -v "$CXX" &>/dev/null; then
-    for CXX in g++ c++ clang++; do
-      command -v "$CXX" &>/dev/null && break
-    done
-  fi
+  for CXX in /opt/homebrew/bin/g++-[0-9]* g++ c++ clang++; do
+    command -v "$CXX" &>/dev/null && break
+  done
   command -v "$CXX" &>/dev/null || { echo "No C++ compiler found."; return 1; }
 
   "$CXX" "$srcpath" -o "$basepath" -O2 -std=c++20 -Wall \
@@ -561,3 +616,5 @@ gcap() {
 if [ -f "$HOME/.bashrc.local" ]; then
     . "$HOME/.bashrc.local"
 fi
+
+_init_prompt

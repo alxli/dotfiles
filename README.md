@@ -13,7 +13,7 @@ The install commands below download individual files directly from GitHub. A ful
   - Prompt auto-detection for oh-my-posh, starship, powerline-go, and powerline-shell, with a colored fallback prompt
   - Safer aliases, navigation shortcuts, colorized `ls` and `grep`, and package manager shortcuts
   - Utility functions including `mkcd`, `up`, `ff`, `fd`, `extract`, `cpprun`, `killport`, `dl`, `sysinfo`, `trash`, `backup`, and `gcap`
-  - A final `~/.bashrc.local` include for machine-specific settings
+  - A near-final `~/.bashrc.local` include for machine-specific settings; prompt initialization runs after it so local `OMP_CONFIG` overrides are honored
 
 ### Install or replace the shell config
 
