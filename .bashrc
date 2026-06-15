@@ -562,6 +562,7 @@ sanitize() {
 
 # Build and run a C++ file, showing execution time and exit code.
 # Usage: cpprun [--clean|-c] file.cpp [args...] [<input] [>output]
+#        CPPRUN_FLAGS='-DLOCAL -g' cpprun file.cpp
 # Useful for competitive programming. On macOS, prefer `brew install gcc` over
 # the built in Apple Clang, so stuff like <bits/stdc++.h> work.
 cpprun() {
@@ -584,7 +585,7 @@ cpprun() {
   done
   command -v "$CXX" &>/dev/null || { echo "No C++ compiler found."; return 1; }
 
-  "$CXX" "$srcpath" -o "$basepath" -O2 -std=c++20 -Wall \
+  "$CXX" "$srcpath" -o "$basepath" -O2 -std=c++20 -Wall ${CPPRUN_FLAGS:-} \
     || { echo "Build failed." >&2; return 1; }
 
   local start_s=$SECONDS status
