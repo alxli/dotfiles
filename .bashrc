@@ -602,10 +602,57 @@ cpprun() {
 
 # ---- Git shortcuts ----
 
+# Short, branch-aware status.
+gs() {
+  git status -sb
+}
+
+# Compact, decorated commit graph (last 20 by default; pass a count or args).
+gl() {
+  case "$1" in
+    ''|*[!0-9]*) git log --oneline --graph --decorate -20 "$@" ;;
+    *) git log --oneline --graph --decorate -"$1" ;;
+  esac
+}
+
+# Undo the last commit but keep its changes staged.
+gundo() {
+  git reset --soft HEAD~1
+}
+
 # Stage all, commit, and push in one step.
 gcap() {
   [ -z "$1" ] && { echo 'Usage: gcap "commit message"'; return 1; }
   git add . && git commit -m "$*" && git push
+}
+
+# Stage all, amend the previous commit, and force-push (with lease).
+# Reuses the existing message unless a new one is given. Prompts before the force-push since it
+# rewrites history that may already be pushed. Pass -f to skip the prompt.
+gcamp() {
+  local force=
+  [ "$1" = "-f" ] && { force=1; shift; }
+  git add . || return 1
+  if [ -n "$1" ]; then
+    git commit --amend -m "$*" || return 1
+  else
+    git commit --amend --no-edit || return 1
+  fi
+  if [ -z "$force" ]; then
+    printf 'Force-push (overwrite remote) %s? [y/N] ' "$(git rev-parse --abbrev-ref HEAD)"
+    read -r reply
+    case "$reply" in
+      [yY]*) ;;
+      *) echo 'Skipped push; commit amended locally.'; return 0 ;;
+    esac
+  fi
+  git push --force-with-lease
+}
+
+# Catch up with the remote, then push: rebase on top of upstream (stashing any
+# dirty work first), and push only if the rebase succeeds.
+gsync() {
+  git pull --rebase --autostash && git push
 }
 
 #============================================================#

@@ -12,7 +12,8 @@ The install commands below download individual files directly from GitHub. A ful
   - `$PATH` helpers: `prepend_to_PATH` and `append_to_PATH`
   - Prompt auto-detection for oh-my-posh, starship, powerline-go, and powerline-shell, with a colored fallback prompt
   - Safer aliases, navigation shortcuts, colorized `ls` and `grep`, and package manager shortcuts
-  - Utility functions including `mkcd`, `up`, `ff`, `fd`, `extract`, `cpprun`, `killport`, `dl`, `sysinfo`, `trash`, `backup`, and `gcap`
+  - Utility functions including `mkcd`, `up`, `ff`, `fd`, `extract`, `cpprun`, `killport`, `dl`, `sysinfo`, `trash`, and `backup`
+  - Git shortcuts: `gs` (short status), `gl` (graph log), `gundo` (undo last commit, keep changes), `gcap` (stage, commit, push), `gcamp` (amend + force-push), and `gsync` (rebase pull, then push)
   - A near-final `~/.bashrc.local` include for machine-specific settings; prompt initialization runs after it so local `OMP_CONFIG` overrides are honored
 
 ### Install or replace the shell config
