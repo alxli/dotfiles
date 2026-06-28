@@ -231,10 +231,11 @@ _init_prompt() {
 }
 _set_basic_ps1
 
-# Flush each command to ~/.bash_history immediately (survives crashes).
-# Append so prompt hooks can still inspect the previous command's exit status.
+# Flush completed commands to ~/.bash_history and import commands from other tabs.
+# This runs at each prompt, so long-running commands like ssh are written after
+# they return to the local shell.
 if [[ ! ";${PROMPT_COMMAND:-};" =~ \;[[:space:]]*history[[:space:]]+-a[[:space:]]*\; ]]; then
-  PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND; }history -a"
+  PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND; }history -a; history -n"
 fi
 
 #============================================================#
@@ -455,6 +456,17 @@ sysinfo() {
   echo -e "${bold}Disk:${reset}"; mydf
   echo
 }
+
+# Live process views for debugging hangs.
+if [ "$(uname)" = "Darwin" ]; then
+  alias topcpu='top -o cpu'
+  alias topmem='top -o rsize'
+else
+  alias topcpu='top -o %CPU'
+  alias topmem='top -o %MEM'
+fi
+alias pscpu='ps aux | sort -nrk 3 | head -20'
+alias psmem='ps aux | sort -nrk 4 | head -20'
 
 # ---- Networking ----
 
